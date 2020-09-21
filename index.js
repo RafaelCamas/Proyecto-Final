@@ -4,6 +4,7 @@ const cors = require('cors');
 
 const userRouter = require('./routes/userRouter');
 const bandsRouter = require('./routes/bandsRouter');
+const autenticar = require('./controllers/autenticar');
 
 const app = express();
 

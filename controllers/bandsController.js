@@ -1,8 +1,10 @@
+const {
+    response
+} = require('express');
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 
-const Band = require('../models/bandsModelMongo')
+const Band = require('../models/BandModelMongo');
+const User = require('../models/UserModelMongo');
 
 mongoose.connect(`mongodb+srv://${process.env.MONGOATLAS_USER}:${process.env.MONGOATLAS_PASS}@servidor1.qpyev.azure.mongodb.net/bands?retryWrites=true&w=majority`, {
     useNewUrlParser: true,
@@ -15,8 +17,8 @@ module.exports = {
             const band = req.body;
             const toAddBanda = new Band();
             toAddBanda.name = band.name;
+            toAddBanda.img = band.img;
             toAddBanda.genre = band.genre;
-            toAddBanda.year = band.year;
             toAddBanda.save((err, bandSaved) => {
                 if (err) throw new Error('Ocurrió un error al añadir la banda', err)
                 res.status(200).json({
@@ -31,29 +33,60 @@ module.exports = {
     },
     getAllBands: async function (req, res) {
         const bandsList = await Band.find();
-        res.status(200).json({
-            ...bandsList
-        });
+        res.status(200).json(bandsList);
     },
     deleteBand: async function (req, res) {
         const bandId = req.params.id;
-        const borrar = await Band.deleteOne(bandId)
+        const borrar = await Band.findByIdAndDelete(bandId);
         res.status(200).json({
-            ...borrar
+            message: "Se ha eliminado la banda correctamente"
         });
     },
     modifyBand: async function (req, res) {
         const bandId = req.params.id;
-        const modify = await Band.findOneAndupdate(bandId)
+        const {
+            name,
+            //genre,
+            //year
+        } = req.body;
+        const dataToUpdate = {
+            name,
+            //genre,
+            // year,
+        };
+        const modify = await Band.findOneAndupdate(bandId, dataToUpdate, {
+            new: true
+        })
         res.status(200).json({
             ...modify
         });
     },
     rateBand: async function (req, res) {
         const bandaId = req.params.id;
-        const rate = await Band. //findOneAndUpdate? updateOne?
-        res.status(200).json({
-            ...rate
+        const rateToAdd = req.body.rate;
+
+        const dataToUpdate = {
+            $push: {
+                rating: rateToAdd
+            }
+        };
+
+        const addRateResult = await Band.findByIdAndUpdate(bandaId, dataToUpdate, {
+            new: true
         });
+        res.status(200).json({
+            ...addRateResult
+        });
+        rateToAdd.save((err, infoSaved) => {
+            if (err) throw new Error('Error al valorar la banda')
+            res.status(200).json({
+                message: 'Banda valorada correctamente',
+                band: infoSaved
+            })
+        })
+    },
+    matchProfile: async function (req, res) {
+        const bandaName = req.params.id;
+        const regexp = '/t(e)(st(\d?))/g';
     }
 }

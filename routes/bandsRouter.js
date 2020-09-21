@@ -1,13 +1,13 @@
-const express = require('express');
-const bandsController = require('../controllers/bandsController');
+const express = require("express");
+const bandsController = require("../controllers/bandsController");
+const autenticar = require('../controllers/autenticar');
 
 const router = express.Router();
 
-router.post('/newBand', bandsController.addBand);
-router.get('/allBands', bandsController.getAllBands);
-// router.delete('/:id', bandsController.deleteBand);
-// router.put('/:id', bandsController.modifyBand);
-// ruta para valorar banda?
-// router.put('/:id', bandsController.rateBand);
+router.get("/", bandsController.getAllBands);
+router.post("/", autenticar, bandsController.addBand);
+router.delete("/:id", autenticar, bandsController.deleteBand);
+router.put("/:id", autenticar, bandsController.modifyBand);
+router.post("/rate/:id", autenticar, bandsController.rateBand);
 
 module.exports = router;

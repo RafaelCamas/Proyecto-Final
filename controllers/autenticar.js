@@ -6,8 +6,9 @@ module.exports = (req, res, next) => {
         res.status(401).json({
             message: "Introduce un token válido por favor"
         });
-        const decodedToken = jwt.verify(token, process.env.SECRET);
-        req.usuario_nombre = decodedToken.usuario_nombre;
-        next();
+        return;
     }
+    const decodedToken = jwt.verify(token, process.env.SECRET);
+    req.nombre_usuario = decodedToken.nombre_usuario;
+    next();
 }
